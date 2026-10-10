@@ -1,0 +1,1634 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BRIM Coffee </title>
+    
+    <!-- Google Fonts: Quicksand & Playfair Display for Premium Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,600&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brim: {
+                            dark: '#3b4a2e',    /* Primary Green */
+                            cream: '#f8f6ec',   /* Soft Off-White/Cream */
+                            accent: '#5a7346',  /* Hover & Highlight Green */
+                            gold: '#f4d7a1',    /* Warm Gold Accent */
+                            light: '#ffffff'    /* Pure White */
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Quicksand', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: #f8f6ec;
+            color: #3b4a2e;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f8f6ec; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3b4a2e; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #5a7346; 
+        }
+
+        /* Marquee Continuous Loop Styling */
+        .marquee-wrapper {
+            overflow: hidden;
+            width: 100%;
+            display: flex;
+            background-color: #ffffff;
+            border-bottom: 1px solid rgba(59, 74, 46, 0.08);
+            position: relative;
+        }
+
+        .marquee-content {
+            display: flex;
+            width: max-content;
+            will-change: transform;
+            cursor: grab;
+            user-select: none;
+            touch-action: pan-y;
+        }
+
+        .marquee-content:active {
+            cursor: grabbing;
+        }
+
+        .search-input-shell {
+            width: min(85%, 500px);
+            transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease, transform 0.3s ease;
+        }
+
+        .search-input-shell.expanded {
+            width: min(100%, 760px);
+            transform: translateY(-1px);
+        }
+
+        .marquee-nav {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.625rem;
+            margin-bottom: 0.75rem;
+            padding: 0 0.25rem;
+        }
+
+        .marquee-nav-btn {
+            width: 2.25rem;
+            height: 2.25rem;
+            border-radius: 9999px;
+            border: 1px solid rgba(59, 74, 46, 0.12);
+            background: rgba(255, 255, 255, 0.88);
+            color: #3b4a2e;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(59, 74, 46, 0.08);
+            transition: all 0.2s ease;
+        }
+
+        .marquee-nav-btn:hover {
+            background: #3b4a2e;
+            color: #f8f6ec;
+            transform: translateY(-1px);
+        }
+
+        @keyframes scrollLeft {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        @keyframes scrollRight {
+            0% { transform: translateX(-50%); }
+            100% { transform: translateX(0); }
+        }
+
+        /* Navigation Page States */
+        .page-hidden {
+            display: none !important;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .hero-section {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-image {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 18%;
+            transform: scale(1.04);
+            filter: brightness(0.8) saturate(0.95);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        @media (max-width: 640px) {
+            .hero-section {
+                min-height: 440px;
+                height: 76svh;
+            }
+
+            .hero-image {
+                transform: scale(1.02);
+                object-position: center 22%;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Card Hover & Highlight Effects */
+        .menu-card {
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @media (hover: hover) {
+            .menu-card:hover {
+                transform: translateY(-6px);
+                box-shadow: 0 14px 30px -8px rgba(59, 74, 46, 0.2);
+            }
+        }
+
+        /* Search Suggestion Highlight pulse on selected item */
+        @keyframes targetPulse {
+            0% { box-shadow: 0 0 0 0px rgba(90, 115, 70, 0.7); transform: scale(1); }
+            50% { box-shadow: 0 0 0 15px rgba(90, 115, 70, 0); transform: scale(1.02); }
+            100% { box-shadow: 0 0 0 0px rgba(90, 115, 70, 0); transform: scale(1); }
+        }
+        .highlight-item {
+            animation: targetPulse 1.5s cubic-bezier(0.16, 1, 0.3, 1) 2;
+            border: 2px solid #5a7346 !important;
+            background-color: #fff !important;
+            z-index: 10;
+        }
+
+        /* Subtle Add-to-Cart Toast */
+        .cart-toast {
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            z-index: 9999;
+            background: #3b4a2e;
+            color: #f8f6ec;
+            padding: 14px 22px;
+            border-radius: 9999px;
+            box-shadow: 0 12px 35px rgba(0,0,0,0.22);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+            border: 1px solid rgba(248, 246, 236, 0.2);
+            width: max-content;
+            max-width: 90vw;
+        }
+
+        .cart-toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Slide-over Drawer Backdrop & Panel */
+        .drawer-backdrop {
+            background-color: rgba(21, 27, 20, 0.55);
+            backdrop-filter: blur(4px);
+            transition: opacity 0.3s ease;
+        }
+
+        /* Backdrop Blur Support */
+        .backdrop-blur-nav {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="antialiased flex flex-col min-h-screen">
+
+    <!-- Toast Notification for Adding Items -->
+    <div id="cartToast" class="cart-toast" role="status" aria-live="polite">
+        <div class="w-7 h-7 rounded-full bg-brim-gold text-brim-dark flex items-center justify-center font-bold text-xs flex-shrink-0">
+            <i class="fas fa-check"></i>
+        </div>
+        <span id="toastMessage" class="font-semibold text-sm truncate">Item added to cart</span>
+    </div>
+
+    <!-- NAVBAR -->
+    <nav class="fixed w-full z-40 bg-brim-light/95 backdrop-blur-nav shadow-sm border-b border-brim-dark/10 transition-all duration-300 py-3">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                
+                <!-- Brand Logo & Name -->
+                <div class="flex-shrink-0 flex items-center cursor-pointer gap-3" onclick="navigateTo('home')">
+                    <img src="logo.jpg" alt="BRIM Coffee Logo" class="h-14 w-14 object-cover rounded-full border-2 border-brim-dark/20 hover:border-brim-dark transition-all shadow-sm" onerror="this.src='https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=150&q=80'">
+                    <span class="font-bold text-2xl tracking-wider text-brim-dark uppercase hidden sm:inline">BRIM</span>
+                </div>
+                
+                <!-- Desktop Navigation Menu -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <button onclick="navigateTo('home')" class="text-brim-dark font-bold hover:text-brim-accent transition-colors">Home</button>
+                    <button onclick="scrollToMenu()" class="text-brim-dark font-bold hover:text-brim-accent transition-colors">Menu</button>
+                    <button onclick="navigateTo('contact')" class="text-brim-dark font-bold hover:text-brim-accent transition-colors">Contact Us</button>
+                    
+                    <!-- Instagram Header Link -->
+                    <a href="#" id="headerInstaLink" target="_blank" class="text-brim-dark hover:text-brim-accent transition-colors" title="Follow us on Instagram">
+                    </a>
+
+                    <!-- Navbar Cart Button -->
+                    <button onclick="openCartDrawer()" class="relative bg-brim-dark text-brim-cream px-5 py-2.5 rounded-full font-bold hover:bg-brim-accent transition-all shadow-md flex items-center gap-2">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span>Cart</span>
+                        <span id="navCartBadge" class="bg-brim-gold text-brim-dark text-xs font-black rounded-full px-2 py-0.5 ml-1">0</span>
+                    </button>
+                </div>
+
+                <!-- Mobile Header Right Actions -->
+                <div class="md:hidden flex items-center gap-4">
+                    <!-- Mobile Instagram Icon -->
+                    <a href="#" id="mobileHeaderInstaLink" target="_blank" class="text-brim-dark hover:text-brim-accent transition-colors">
+                    </a>
+                    
+                    <button onclick="openCartDrawer()" class="relative bg-brim-dark text-brim-cream p-2.5 rounded-full shadow-md">
+                        <i class="fas fa-shopping-bag text-lg px-1"></i>
+                        <span id="mobileNavCartBadge" class="absolute -top-1 -right-1 bg-brim-gold text-brim-dark text-xs font-black rounded-full w-5 h-5 flex items-center justify-center border-2 border-white">0</span>
+                    </button>
+                    <button onclick="toggleMobileMenu()" class="text-brim-dark focus:outline-none p-2">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Dropdown Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-brim-light border-t border-brim-dark/10">
+            <div class="px-4 pt-3 pb-4 space-y-2 flex flex-col items-center">
+                <button onclick="navigateTo('home'); toggleMobileMenu()" class="block px-3 py-2 text-brim-dark font-bold w-full text-center hover:bg-brim-cream rounded-xl">Home</button>
+                <button onclick="scrollToMenu(); toggleMobileMenu()" class="block px-3 py-2 text-brim-dark font-bold w-full text-center hover:bg-brim-cream rounded-xl">Menu</button>
+                <button onclick="navigateTo('contact'); toggleMobileMenu()" class="block px-3 py-2 text-brim-dark font-bold w-full text-center hover:bg-brim-cream rounded-xl">Contact Us</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- FLOATING CART BUTTON (Fixed Bottom-Right) -->
+    <div class="fixed bottom-6 right-6 z-30">
+        <button onclick="openCartDrawer()" class="group relative bg-brim-dark text-brim-cream p-4 rounded-full shadow-2xl hover:bg-brim-accent hover:scale-105 transition-all duration-300 flex items-center justify-center border-2 border-brim-gold/40">
+            <i class="fas fa-shopping-bag text-2xl"></i>
+            <span id="floatingCartCount" class="absolute -top-2 -right-2 bg-brim-gold text-brim-dark text-xs font-black rounded-full w-6 h-6 flex items-center justify-center shadow-md border-2 border-brim-dark">0</span>
+            <span class="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-xs transition-all duration-300 ease-in-out font-bold text-sm text-brim-cream pl-0 group-hover:pl-2">
+                View Cart
+            </span>
+        </button>
+    </div>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-grow pt-[88px]"> <!-- Accounted for fixed navbar height -->
+        
+        <!-- ================= HOME PAGE ================= -->
+        <div id="home-view" class="fade-in">
+            
+            <!-- Premium Hero Section (Fully Responsive) -->
+            <section class="hero-section w-full h-[85svh] min-h-[500px] max-h-[900px] flex items-center justify-center">
+                <!-- Background Image Layer -->
+                <img src="hero.png" alt="BRIM Coffee Storefront" class="hero-image" onerror="this.src='https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1920&q=80'">
+                <!-- Premium Dark Overlay for text legibility -->
+                <div class="hero-overlay"></div>
+
+                <div class="hero-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-center flex flex-col items-center">
+                   
+                    
+                    <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6 text-white drop-shadow-md">
+                        Crafted for the <br class="hidden sm:block">
+                        <span class="font-serif italic text-brim-gold font-medium">Perfect Moment</span>
+                    </h1>
+                    
+                    <p class="text-base sm:text-lg md:text-xl text-white/90 mb-10 max-w-xl leading-relaxed drop-shadow-sm font-medium">
+                        Signature specialty coffee and artisan pastries, delivered straight to your door.
+                    </p>
+                    
+                    <button onclick="scrollToMenu()" class="bg-brim-gold text-brim-dark px-10 py-4 rounded-full text-sm font-bold tracking-widest uppercase hover:bg-white hover:-translate-y-1 transition-all duration-300 shadow-xl flex items-center gap-3">
+                        Explore The Menu <i class="fas fa-arrow-down"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Menu Section -->
+            <section id="menu-section" class="py-16 bg-brim-light">
+                
+                <!-- SMART MENU SEARCH BAR -->
+                <div class="max-w-3xl mx-auto px-4 mb-8 text-center relative z-20">
+                    <div class="inline-block mb-2 text-xs font-bold uppercase tracking-[0.2em] text-brim-accent">
+                        Find Your Favorite
+                    </div>
+                    
+                    <div class="relative mt-2 mx-auto w-full max-w-[760px]">
+                        <div class="search-input-shell relative mx-auto flex items-center shadow-xl rounded-full bg-white border-2 border-brim-dark/15 focus-within:border-brim-dark transition-all">
+                            <span class="pl-6 text-brim-dark/50 text-lg">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input id="smartMenuSearch" type="text" placeholder="Search coffee, drinks, or bakery..." autocomplete="off" class="w-full py-4 pl-4 pr-12 text-brim-dark font-semibold placeholder:text-brim-dark/40 bg-transparent rounded-full focus:outline-none text-base" onfocus="this.closest('.search-input-shell')?.classList.add('expanded')" onblur="if (!this.value.trim()) this.closest('.search-input-shell')?.classList.remove('expanded')">
+                            <button id="clearSearchBtn" onclick="clearSmartSearch()" class="hidden absolute right-5 text-brim-dark/40 hover:text-brim-dark p-1">
+                                <i class="fas fa-times-circle text-lg"></i>
+                            </button>
+                        </div>
+
+                        <!-- Live Suggestions Dropdown Container -->
+                        <div id="searchSuggestions" class="hidden absolute left-0 right-0 top-full mt-3 bg-white border border-brim-dark/10 rounded-3xl shadow-2xl max-h-80 overflow-y-auto z-50 text-left p-2 divide-y divide-brim-dark/5">
+                            <!-- Populated dynamically via JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <!-- Search Result Label Indicator -->
+                    <div id="searchResultLabel" class="hidden mt-6 text-sm font-bold bg-brim-cream border border-brim-dark/10 inline-flex items-center gap-2 px-4 py-2 rounded-full shadow-sm">
+                        <i class="fas fa-crosshairs text-brim-accent"></i>
+                        <span class="text-brim-dark/70">Showing result for:</span>
+                        <span id="searchResultTerm" class="text-brim-dark"></span>
+                        <button onclick="clearSearchResultFocus()" class="ml-2 text-brim-dark/40 hover:text-red-500 transition-colors">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- MENU SLIDERS (MARQUEES) -->
+                <!-- Row 1: Moving Left (Classic Coffee) -->
+                <div class="max-w-7xl mx-auto px-4">
+                    <div class="marquee-nav">
+                        <button type="button" class="marquee-nav-btn" data-marquee-target="coffee-marquee" data-marquee-action="prev" aria-label="Previous coffee items">
+                            <i class="fas fa-chevron-left text-xs"></i>
+                        </button>
+                        <button type="button" class="marquee-nav-btn" data-marquee-target="coffee-marquee" data-marquee-action="next" aria-label="Next coffee items">
+                            <i class="fas fa-chevron-right text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="coffee-marquee" class="marquee-wrapper py-6">
+                    <div class="marquee-content gap-4 sm:gap-6 px-2 sm:px-3" data-direction="left" data-speed="42s">
+                        
+                        <!-- CARD STRUCTURE IMPROVED FOR RESPONSIVENESS (w-[85vw] max-w-[256px] prevents mobile overflow) -->
+                        <div class="menu-card bg-brim-cream border border-brim-dark/10 rounded-3xl p-4 sm:p-5 w-[85vw] max-w-[256px] sm:w-64 flex-shrink-0 flex flex-col items-center text-center shadow-sm relative group" data-item-id="espresso">
+                            <div class="w-32 h-32 sm:w-36 sm:h-36 bg-white rounded-2xl mb-4 flex items-center justify-center shadow-md overflow-hidden border border-brim-dark/10 relative">
+                                <img src="https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?auto=format&fit=crop&w=400&q=80" alt="Classic Espresso" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            </div>
+                            <span class="text-[10px] font-black uppercase tracking-widest text-brim-accent bg-white/80 px-2.5 py-0.5 rounded-full mb-1 border border-brim-dark/10">Coffee</span>
+                            <h3 class="text-lg sm:text-xl font-bold text-brim-dark mb-1 break-words w-full">Classic Espresso</h3>
+                            <p class="text-xs text-brim-dark/70 mb-3 min-h-[32px] line-clamp-2">Rich, bold, and pure single shot.</p>
+                            <!-- Flex wrap prevents price/button collision on narrow screens -->
+                            <div class="mt-auto w-full flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-brim-dark/10">
+                                <span class="font-extrabold text-base sm:text-lg text-brim-dark whitespace-nowrap">AED 14</span>
+                                <button type="button" onclick="addToCart('espresso')" class="bg-brim-dark text-brim-cream hover:bg-brim-accent px-4 py-2 rounded-full font-bold text-xs transition-all shadow-sm active:scale-95 flex items-center gap-1.5 flex-shrink-0">
+                                    <i class="fas fa-plus"></i> Add
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="menu-card bg-brim-cream border border-brim-dark/10 rounded-3xl p-4 sm:p-5 w-[85vw] max-w-[256px] sm:w-64 flex-shrink-0 flex flex-col items-center text-center shadow-sm relative group" data-item-id="cappuccino">
+                            <div class="w-32 h-32 sm:w-36 sm:h-36 bg-white rounded-2xl mb-4 flex items-center justify-center shadow-md overflow-hidden border border-brim-dark/10 relative">
+                                <img src="https://images.unsplash.com/photo-1534778101976-62847782c213?auto=format&fit=crop&w=400&q=80" alt="Creamy Cappuccino" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            </div>
+                            <span class="text-[10px] font-black uppercase tracking-widest text-brim-accent bg-white/80 px-2.5 py-0.5 rounded-full mb-1 border border-brim-dark/10">Coffee</span>
+                            <h3 class="text-lg sm:text-xl font-bold text-brim-dark mb-1 break-words w-full">Creamy Cappuccino</h3>
+                            <p class="text-xs text-brim-dark/70 mb-3 min-h-[32px] line-clamp-2">Perfect balance of espresso & rich foam.</p>
+                            <div class="mt-auto w-full flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-brim-dark/10">
+                                <span class="font-extrabold text-base sm:text-lg text-brim-dark whitespace-nowrap">AED 18</span>
+                                <button type="button" onclick="addToCart('cappuccino')" class="bg-brim-dark text-brim-cream hover:bg-brim-accent px-4 py-2 rounded-full font-bold text-xs transition-all shadow-sm active:scale-95 flex items-center gap-1.5 flex-shrink-0">
+                                    <i class="fas fa-plus"></i> Add
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="menu-card bg-brim-cream border border-brim-dark/10 rounded-3xl p-4 sm:p-5 w-[85vw] max-w-[256px] sm:w-64 flex-shrink-0 flex flex-col items-center text-center shadow-sm relative group" data-item-id="latte">
+                            <div class="w-32 h-32 sm:w-36 sm:h-36 bg-white rounded-2xl mb-4 flex items-center justify-center shadow-md overflow-hidden border border-brim-dark/10 relative">
+                                <img src="https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?auto=format&fit=crop&w=400&q=80" alt="Vanilla Latte" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            </div>
+                            <span class="text-[10px] font-black uppercase tracking-widest text-brim-accent bg-white/80 px-2.5 py-0.5 rounded-full mb-1 border border-brim-dark/10">Coffee</span>
+                            <h3 class="text-lg sm:text-xl font-bold text-brim-dark mb-1 break-words w-full">Vanilla Latte</h3>
+                            <p class="text-xs text-brim-dark/70 mb-3 min-h-[32px] line-clamp-2">Smooth espresso with sweet Madagascar vanilla.</p>
+                            <div class="mt-auto w-full flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-brim-dark/10">
+                                <span class="font-extrabold text-base sm:text-lg text-brim-dark whitespace-nowrap">AED 20</span>
+                                <button type="button" onclick="addToCart('latte')" class="bg-brim-dark text-brim-cream hover:bg-brim-accent px-4 py-2 rounded-full font-bold text-xs transition-all shadow-sm active:scale-95 flex items-center gap-1.5 flex-shrink-0">
+                                    <i class="fas fa-plus"></i> Add
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="menu-card bg-brim-cream border border-brim-dark/10 rounded-3xl p-4 sm:p-5 w-[85vw] max-w-[256px] sm:w-64 flex-shrink-0 flex flex-col items-center text-center shadow-sm relative group" data-item-id="americano">
+                            <div class="w-32 h-32 sm:w-36 sm:h-36 bg-white rounded-2xl mb-4 flex items-center justify-center shadow-md overflow-hidden border border-brim-dark/10 relative">
+                                <img src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=400&q=80" alt="Black Americano" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            </div>
+                            <span class="text-[10px] font-black uppercase tracking-widest text-brim-accent bg-white/80 px-2.5 py-0.5 rounded-full mb-1 border border-brim-dark/10">Coffee</span>
+                            <h3 class="text-lg sm:text-xl font-bold text-brim-dark mb-1 break-words w-full">Black Americano</h3>
+                            <p class="text-xs text-brim-dark/70 mb-3 min-h-[32px] line-clamp-2">Bold espresso diluted with hot water.</p>
+                            <div class="mt-auto w-full flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-brim-dark/10">
+                                <span class="font-extrabold text-base sm:text-lg text-brim-dark whitespace-nowrap">AED 15</span>
+                                <button type="button" onclick="addToCart('americano')" class="bg-brim-dark text-brim-cream hover:bg-brim-accent px-4 py-2 rounded-full font-bold text-xs transition-all shadow-sm active:scale-95 flex items-center gap-1.5 flex-shrink-0">
+                                    <i class="fas fa-plus"></i> Add
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="menu-card bg-brim-cream border border-brim-dark/10 rounded-3xl p-4 sm:p-5 w-[85vw] max-w-[256px] sm:w-64 flex-shrink-0 flex flex-col items-center text-center shadow-sm relative group" data-item-id="mocha">
+                            <div class="w-32 h-32 sm:w-36 sm:h-36 bg-white rounded-2xl mb-4 flex items-center justify-center shadow-md overflow-hidden border border-brim-dark/10 relative">
+                                <img src="https://images.unsplash.com/photo-1578314675249-a6910f80cc4e?auto=format&fit=crop&w=400&q=80" alt="Dark Mocha" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            </div>
+                            <span class="text-[10px] font-black uppercase tracking-widest text-brim-accent bg-white/80 px-2.5 py-0.5 rounded-full mb-1 border border-brim-dark/10">Coffee</span>
+                            <h3 class="text-lg sm:text-xl font-bold text-brim-dark mb-1 break-words w-full">Dark Mocha</h3>
+                            <p class="text-xs text-brim-dark/70 mb-3 min-h-[32px] line-clamp-2">Espresso meets rich Belgian dark chocolate.</p>
+                            <div class="mt-auto w-full flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-brim-dark/10">
+                                <span class="font-extrabold text-base sm:text-lg text-brim-dark whitespace-nowrap">AED 22</span>
+                                <button type="button" onclick="addToCart('mocha')" class="bg-brim-dark text-brim-cream hover:bg-brim-accent px-4 py-2 rounded-full font-bold text-xs transition-all shadow-sm active:scale-95 flex items-center gap-1.5 flex-shrink-0">
+                                    <i class="fas fa-plus"></i> Add
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Row 2: Moving Right (Cold Drinks / Refreshers) -->
+                <div class="max-w-7xl mx-auto px-4">
+                    <div class="marquee-nav">
+                        <button type="button" class="marquee-nav-btn" data-marquee-target="cold-marquee" data-marquee-action="prev" aria-label="Previous cold drinks">
+                            <i class="fas fa-chevron-left text-xs"></i>
+                        </button>
+                        <button type="button" class="marquee-nav-btn" data-marquee-target="cold-marquee" data-marquee-action="next" aria-label="Next cold drinks">
+                            <i class="fas fa-chevron-right text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="cold-marquee" class="marquee-wrapper py-6 bg-brim-cream/40">
+                    <div class="marquee-content gap-4 sm:gap-6 px-2 sm:px-3" data-direction="right" data-speed="46s">
+                        
+                        <div class="menu-card bg-white border border-brim-dark/10 rounded-3xl p-4 sm:p-5 w-[85vw] max-w-[256px] sm:w-64 flex-shrink-0 flex flex-col items-center text-center shadow-sm relative group" data-item-id="matcha">
+                            <div class="w-32 h-32 sm:w-36 sm:h-36 bg-brim-cream rounded-2xl mb-4 flex items-center justify-center shadow-md overflow-hidden border border-brim-dark/10 relative">
+                                <img src="https://images.unsplash.com/photo-1536256263959-770b48d82b0a?auto=format&fit=crop&w=400&q=80" alt="Iced Matcha" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                             </div>
+                            <span class="text-[10px] font-black uppercase tracking-widest text-brim-accent bg-brim-cream px-2.5 py-0.5 rounded-full mb-1 border border-brim-dark/10">Cold Drinks</span>
+                            <h3 class="text-lg sm:text-xl font-bold text-brim-dark mb-1 break-words w-full">Iced Matcha</h3>
+                            <p class="text-xs text-brim-dark/70 mb-3 min-h-[32px] line-clamp-2">Uji ceremonial grade matcha with cold milk.</p>
+                            <div class="mt-auto w-full flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-brim-dark/10">
+                                <span class="font-extrabold text-base sm:text-lg text-brim-dark whitespace-nowrap">AED 24</span>
+                                <button type="button" onclick="addToCart('matcha')" class="bg-brim-dark text-brim-cream hover:bg-brim-accent px-4 py-2 rounded-full font-bold text-xs transition-all shadow-sm active:scale-95 flex items-center gap-1.5 flex-shrink-0">
+                                    <i class="fas fa-plus"></i> Add
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="menu-card bg-white border border-brim-dark/10 rounded-3xl p-4 sm:p-5 w-[85vw] max-w-[256px] sm:w-64 flex-shrink-0 flex flex-col items-center text-center shadow-sm relative group" data-item-id="coldbrew">
+                            <div class="w-32 h-32 sm:w-36 sm:h-36 bg-brim-cream rounded-2xl mb-4 flex items-center justify-center shadow-md overflow-hidden border border-brim-dark/10 relative">
+                                <img src="https://images.unsplash.com/photo-1517701604599-bb29b565090c?auto=format&fit=crop&w=400&q=80" alt="Nitro Cold Brew" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            </div>
+                            <span class="text-[10px] font-black uppercase tracking-widest text-brim-accent bg-brim-cream px-2.5 py-0.5 rounded-full mb-1 border border-brim-dark/10">Cold Drinks</span>
+                            <h3 class="text-lg sm:text-xl font-bold text-brim-dark mb-1 break-words w-full">Nitro Cold Brew</h3>
+                            <p class="text-xs text-brim-dark/70 mb-3 min-h-[32px] line-clamp-2">Slow-steeped 18 hours, infused with nitrogen.</p>
+                            <div class="mt-auto w-full flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-brim-dark/10">
+                                <span class="font-extrabold text-base sm:text-lg text-brim-dark whitespace-nowrap">AED 22</span>
+                                <button type="button" onclick="addToCart('coldbrew')" class="bg-brim-dark text-brim-cream hover:bg-brim-accent px-4 py-2 rounded-full font-bold text-xs transition-all shadow-sm active:scale-95 flex items-center gap-1.5 flex-shrink-0">
+                                    <i class="fas fa-plus"></i> Add
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="menu-card bg-white border border-brim-dark/10 rounded-3xl p-4 sm:p-5 w-[85vw] max-w-[256px] sm:w-64 flex-shrink-0 flex flex-col items-center text-center shadow-sm relative group" data-item-id="frappe">
+                            <div class="w-32 h-32 sm:w-36 sm:h-36 bg-brim-cream rounded-2xl mb-4 flex items-center justify-center shadow-md overflow-hidden border border-brim-dark/10 relative">
+                                <img src="https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=400&q=80" alt="Caramel Frappe" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            </div>
+                            <span class="text-[10px] font-black uppercase tracking-widest text-brim-accent bg-brim-cream px-2.5 py-0.5 rounded-full mb-1 border border-brim-dark/10">Cold Drinks</span>
+                            <h3 class="text-lg sm:text-xl font-bold text-brim-dark mb-1 break-words w-full">Caramel Frappe</h3>
+                            <p class="text-xs text-brim-dark/70 mb-3 min-h-[32px] line-clamp-2">Blended coffee with rich caramel drizzle.</p>
+                            <div class="mt-auto w-full flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-brim-dark/10">
+                                <span class="font-extrabold text-base sm:text-lg text-brim-dark whitespace-nowrap">AED 25</span>
+                                <button type="button" onclick="addToCart('frappe')" class="bg-brim-dark text-brim-cream hover:bg-brim-accent px-4 py-2 rounded-full font-bold text-xs transition-all shadow-sm active:scale-95 flex items-center gap-1.5 flex-shrink-0">
+                                    <i class="fas fa-plus"></i> Add
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="menu-card bg-white border border-brim-dark/10 rounded-3xl p-4 sm:p-5 w-[85vw] max-w-[256px] sm:w-64 flex-shrink-0 flex flex-col items-center text-center shadow-sm relative group" data-item-id="icedtea">
+                            <div class="w-32 h-32 sm:w-36 sm:h-36 bg-brim-cream rounded-2xl mb-4 flex items-center justify-center shadow-md overflow-hidden border border-brim-dark/10 relative">
+                                <img src="https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=400&q=80" alt="Peach Iced Tea" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            </div>
+                            <span class="text-[10px] font-black uppercase tracking-widest text-brim-accent bg-brim-cream px-2.5 py-0.5 rounded-full mb-1 border border-brim-dark/10">Cold Drinks</span>
+                            <h3 class="text-lg sm:text-xl font-bold text-brim-dark mb-1 break-words w-full">Peach Iced Tea</h3>
+                            <p class="text-xs text-brim-dark/70 mb-3 min-h-[32px] line-clamp-2">Hand-brewed black tea with peach nectar.</p>
+                            <div class="mt-auto w-full flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-brim-dark/10">
+                                <span class="font-extrabold text-base sm:text-lg text-brim-dark whitespace-nowrap">AED 18</span>
+                                <button type="button" onclick="addToCart('icedtea')" class="bg-brim-dark text-brim-cream hover:bg-brim-accent px-4 py-2 rounded-full font-bold text-xs transition-all shadow-sm active:scale-95 flex items-center gap-1.5 flex-shrink-0">
+                                    <i class="fas fa-plus"></i> Add
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="menu-card bg-white border border-brim-dark/10 rounded-3xl p-4 sm:p-5 w-[85vw] max-w-[256px] sm:w-64 flex-shrink-0 flex flex-col items-center text-center shadow-sm relative group" data-item-id="smoothie">
+                            <div class="w-32 h-32 sm:w-36 sm:h-36 bg-brim-cream rounded-2xl mb-4 flex items-center justify-center shadow-md overflow-hidden border border-brim-dark/10 relative">
+                                <img src="https://images.unsplash.com/photo-1553530666-ba11a7da3888?auto=format&fit=crop&w=400&q=80" alt="Berry Berry Smoothie" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            </div>
+                            <span class="text-[10px] font-black uppercase tracking-widest text-brim-accent bg-brim-cream px-2.5 py-0.5 rounded-full mb-1 border border-brim-dark/10">Cold Drinks</span>
+                            <h3 class="text-lg sm:text-xl font-bold text-brim-dark mb-1 break-words w-full">Berry Berry</h3>
+                            <p class="text-xs text-brim-dark/70 mb-3 min-h-[32px] line-clamp-2">Fresh organic berries & Greek yogurt blend.</p>
+                            <div class="mt-auto w-full flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-brim-dark/10">
+                                <span class="font-extrabold text-base sm:text-lg text-brim-dark whitespace-nowrap">AED 24</span>
+                                <button type="button" onclick="addToCart('smoothie')" class="bg-brim-dark text-brim-cream hover:bg-brim-accent px-4 py-2 rounded-full font-bold text-xs transition-all shadow-sm active:scale-95 flex items-center gap-1.5 flex-shrink-0">
+                                    <i class="fas fa-plus"></i> Add
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Row 3: Moving Left (Bakery Treats) -->
+                <div class="max-w-7xl mx-auto px-4">
+                    <div class="marquee-nav">
+                        <button type="button" class="marquee-nav-btn" data-marquee-target="bakery-marquee" data-marquee-action="prev" aria-label="Previous bakery items">
+                            <i class="fas fa-chevron-left text-xs"></i>
+                        </button>
+                        <button type="button" class="marquee-nav-btn" data-marquee-target="bakery-marquee" data-marquee-action="next" aria-label="Next bakery items">
+                            <i class="fas fa-chevron-right text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="bakery-marquee" class="marquee-wrapper py-6">
+                    <div class="marquee-content gap-4 sm:gap-6 px-2 sm:px-3" data-direction="left" data-speed="38s">
+                        
+                        <div class="menu-card bg-brim-cream border border-brim-dark/10 rounded-3xl p-4 sm:p-5 w-[85vw] max-w-[256px] sm:w-64 flex-shrink-0 flex flex-col items-center text-center shadow-sm relative group" data-item-id="croissant">
+                            <div class="w-32 h-32 sm:w-36 sm:h-36 bg-white rounded-2xl mb-4 flex items-center justify-center shadow-md overflow-hidden border border-brim-dark/10 relative">
+                                <img src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=400&q=80" alt="Butter Croissant" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            </div>
+                            <span class="text-[10px] font-black uppercase tracking-widest text-brim-accent bg-white/80 px-2.5 py-0.5 rounded-full mb-1 border border-brim-dark/10">Bakery</span>
+                            <h3 class="text-lg sm:text-xl font-bold text-brim-dark mb-1 break-words w-full">Butter Croissant</h3>
+                            <p class="text-xs text-brim-dark/70 mb-3 min-h-[32px] line-clamp-2">Flaky, French butter croissant baked daily.</p>
+                            <div class="mt-auto w-full flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-brim-dark/10">
+                                <span class="font-extrabold text-base sm:text-lg text-brim-dark whitespace-nowrap">AED 14</span>
+                                <button type="button" onclick="addToCart('croissant')" class="bg-brim-dark text-brim-cream hover:bg-brim-accent px-4 py-2 rounded-full font-bold text-xs transition-all shadow-sm active:scale-95 flex items-center gap-1.5 flex-shrink-0">
+                                    <i class="fas fa-plus"></i> Add
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="menu-card bg-brim-cream border border-brim-dark/10 rounded-3xl p-4 sm:p-5 w-[85vw] max-w-[256px] sm:w-64 flex-shrink-0 flex flex-col items-center text-center shadow-sm relative group" data-item-id="muffin">
+                            <div class="w-32 h-32 sm:w-36 sm:h-36 bg-white rounded-2xl mb-4 flex items-center justify-center shadow-md overflow-hidden border border-brim-dark/10 relative">
+                                <img src="https://images.unsplash.com/photo-1607958996333-41aef7caefaa?auto=format&fit=crop&w=400&q=80" alt="Blueberry Muffin" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            </div>
+                            <span class="text-[10px] font-black uppercase tracking-widest text-brim-accent bg-white/80 px-2.5 py-0.5 rounded-full mb-1 border border-brim-dark/10">Bakery</span>
+                            <h3 class="text-lg sm:text-xl font-bold text-brim-dark mb-1 break-words w-full">Blueberry Muffin</h3>
+                            <p class="text-xs text-brim-dark/70 mb-3 min-h-[32px] line-clamp-2">Moist muffin loaded with wild blueberries.</p>
+                            <div class="mt-auto w-full flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-brim-dark/10">
+                                <span class="font-extrabold text-base sm:text-lg text-brim-dark whitespace-nowrap">AED 16</span>
+                                <button type="button" onclick="addToCart('muffin')" class="bg-brim-dark text-brim-cream hover:bg-brim-accent px-4 py-2 rounded-full font-bold text-xs transition-all shadow-sm active:scale-95 flex items-center gap-1.5 flex-shrink-0">
+                                    <i class="fas fa-plus"></i> Add
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="menu-card bg-brim-cream border border-brim-dark/10 rounded-3xl p-4 sm:p-5 w-[85vw] max-w-[256px] sm:w-64 flex-shrink-0 flex flex-col items-center text-center shadow-sm relative group" data-item-id="brownie">
+                            <div class="w-32 h-32 sm:w-36 sm:h-36 bg-white rounded-2xl mb-4 flex items-center justify-center shadow-md overflow-hidden border border-brim-dark/10 relative">
+                                <img src="https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=400&q=80" alt="Fudge Brownie" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            </div>
+                            <span class="text-[10px] font-black uppercase tracking-widest text-brim-accent bg-white/80 px-2.5 py-0.5 rounded-full mb-1 border border-brim-dark/10">Bakery</span>
+                            <h3 class="text-lg sm:text-xl font-bold text-brim-dark mb-1 break-words w-full">Fudge Brownie</h3>
+                            <p class="text-xs text-brim-dark/70 mb-3 min-h-[32px] line-clamp-2">Gooey, dark chocolate fudge brownie.</p>
+                            <div class="mt-auto w-full flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-brim-dark/10">
+                                <span class="font-extrabold text-base sm:text-lg text-brim-dark whitespace-nowrap">AED 15</span>
+                                <button type="button" onclick="addToCart('brownie')" class="bg-brim-dark text-brim-cream hover:bg-brim-accent px-4 py-2 rounded-full font-bold text-xs transition-all shadow-sm active:scale-95 flex items-center gap-1.5 flex-shrink-0">
+                                    <i class="fas fa-plus"></i> Add
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="menu-card bg-brim-cream border border-brim-dark/10 rounded-3xl p-4 sm:p-5 w-[85vw] max-w-[256px] sm:w-64 flex-shrink-0 flex flex-col items-center text-center shadow-sm relative group" data-item-id="cookie">
+                            <div class="w-32 h-32 sm:w-36 sm:h-36 bg-white rounded-2xl mb-4 flex items-center justify-center shadow-md overflow-hidden border border-brim-dark/10 relative">
+                                <img src="https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&w=400&q=80" alt="Choco Chip Cookie" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            </div>
+                            <span class="text-[10px] font-black uppercase tracking-widest text-brim-accent bg-white/80 px-2.5 py-0.5 rounded-full mb-1 border border-brim-dark/10">Bakery</span>
+                            <h3 class="text-lg sm:text-xl font-bold text-brim-dark mb-1 break-words w-full">Choco Chip Cookie</h3>
+                            <p class="text-xs text-brim-dark/70 mb-3 min-h-[32px] line-clamp-2">Warm, soft-baked cookie with chocolate chunks.</p>
+                            <div class="mt-auto w-full flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-brim-dark/10">
+                                <span class="font-extrabold text-base sm:text-lg text-brim-dark whitespace-nowrap">AED 12</span>
+                                <button type="button" onclick="addToCart('cookie')" class="bg-brim-dark text-brim-cream hover:bg-brim-accent px-4 py-2 rounded-full font-bold text-xs transition-all shadow-sm active:scale-95 flex items-center gap-1.5 flex-shrink-0">
+                                    <i class="fas fa-plus"></i> Add
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="menu-card bg-brim-cream border border-brim-dark/10 rounded-3xl p-4 sm:p-5 w-[85vw] max-w-[256px] sm:w-64 flex-shrink-0 flex flex-col items-center text-center shadow-sm relative group" data-item-id="cheesecake">
+                            <div class="w-32 h-32 sm:w-36 sm:h-36 bg-white rounded-2xl mb-4 flex items-center justify-center shadow-md overflow-hidden border border-brim-dark/10 relative">
+                                <img src="https://images.unsplash.com/photo-1533134242443-d4fd215305ad?auto=format&fit=crop&w=400&q=80" alt="Cheesecake Slice" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            </div>
+                            <span class="text-[10px] font-black uppercase tracking-widest text-brim-accent bg-white/80 px-2.5 py-0.5 rounded-full mb-1 border border-brim-dark/10">Bakery</span>
+                            <h3 class="text-lg sm:text-xl font-bold text-brim-dark mb-1 break-words w-full">Cheesecake Slice</h3>
+                            <p class="text-xs text-brim-dark/70 mb-3 min-h-[32px] line-clamp-2">Classic creamy New York cheesecake.</p>
+                            <div class="mt-auto w-full flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-brim-dark/10">
+                                <span class="font-extrabold text-base sm:text-lg text-brim-dark whitespace-nowrap">AED 22</span>
+                                <button type="button" onclick="addToCart('cheesecake')" class="bg-brim-dark text-brim-cream hover:bg-brim-accent px-4 py-2 rounded-full font-bold text-xs transition-all shadow-sm active:scale-95 flex items-center gap-1.5 flex-shrink-0">
+                                    <i class="fas fa-plus"></i> Add
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </section>
+        </div>
+
+        <!-- ================= CONTACT PAGE ================= -->
+        <div id="contact-view" class="page-hidden fade-in bg-brim-light min-h-[70vh]">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+                <!-- Header -->
+                <div class="text-center mb-12">
+                    <span class="text-xs font-bold uppercase tracking-[0.2em] text-brim-accent">Locations & Hours</span>
+                    <h2 class="text-4xl md:text-5xl font-bold text-brim-dark mt-1 mb-4">Visit BRIM Coffee</h2>
+                    <p class="text-brim-dark/70 text-base md:text-lg max-w-2xl mx-auto">We are located in the heart of Abu Dhabi. Stop by for your daily brew or order online for direct delivery.</p>
+                </div>
+
+                <div class="flex flex-col lg:flex-row gap-10 bg-brim-cream rounded-[36px] p-6 md:p-12 shadow-xl border border-brim-dark/10">
+                    
+                    <!-- Contact Details -->
+                    <div class="w-full lg:w-1/2 flex flex-col justify-center space-y-8">
+                        <div>
+                            <div class="flex items-center mb-2">
+                                <div class="w-12 h-12 bg-brim-dark rounded-2xl flex items-center justify-center text-brim-cream mr-4 shadow-md flex-shrink-0">
+                                    <i class="fas fa-map-marker-alt text-xl text-brim-gold"></i>
+                                </div>
+                                <h3 class="text-xl md:text-2xl font-bold text-brim-dark">Our Location</h3>
+                            </div>
+                            <p class="text-brim-dark/80 ml-16 text-base md:text-lg">Al Nahyan Sector, Abu Dhabi<br>United Arab Emirates</p>
+                        </div>
+                        
+                        <div>
+                            <div class="flex items-center mb-2">
+                                <div class="w-12 h-12 bg-brim-dark rounded-2xl flex items-center justify-center text-brim-cream mr-4 shadow-md flex-shrink-0">
+                                    <i class="fas fa-envelope text-xl text-brim-gold"></i>
+                                </div>
+                                <h3 class="text-xl md:text-2xl font-bold text-brim-dark">Email Support</h3>
+                            </div>
+                            <p class="text-brim-dark/80 ml-16 text-base md:text-lg hover:text-brim-accent cursor-pointer transition-colors break-words">brimuae@.com</p>
+                        </div>
+
+                        <div>
+                            <div class="flex items-center mb-2">
+                                <div class="w-12 h-12 bg-brim-dark rounded-2xl flex items-center justify-center text-brim-cream mr-4 shadow-md flex-shrink-0">
+                                    <i class="fas fa-phone-alt text-xl text-brim-gold"></i>
+                                </div>
+                                <h3 class="text-xl md:text-2xl font-bold text-brim-dark">Call or WhatsApp</h3>
+                            </div>
+                            <a href="tel:+971506886424" class="block text-brim-dark/80 ml-16 text-base md:text-lg font-bold hover:text-brim-accent transition-colors">+971 50 688 6424</a>
+                        </div>
+
+                        <div class="pt-4 border-t border-brim-dark/10 ml-0 md:ml-16">
+                            <h4 class="font-extrabold text-brim-dark mb-3 text-center md:text-left">Connect With Us</h4>
+                            <div class="flex flex-wrap gap-3 justify-center md:justify-start">
+                                <a href="https://www.instagram.com/ksi.webs/" id="contactInstaLink" target="_blank" rel="noopener" class="inline-flex items-center gap-2 bg-white rounded-full px-4 py-2.5 text-brim-dark hover:bg-brim-dark hover:text-white transition-all shadow-sm font-extrabold text-sm">
+                                    <i class="fab fa-instagram text-lg"></i>
+                                    <span>Instagram</span>
+                                </a>
+                                <a href="#" class="w-11 h-11 bg-white rounded-full flex items-center justify-center text-brim-dark hover:bg-brim-dark hover:text-white transition-all shadow-sm">
+                                    <i class="fab fa-facebook-f text-lg"></i>
+                                </a>
+                                <a href="https" id="contactWhatsAppLink" target="_blank" rel="noopener" class="w-11 h-11 bg-white rounded-full flex items-center justify-center text-brim-dark hover:bg-brim-dark hover:text-white transition-all shadow-sm">
+                                    <i class="fab fa-whatsapp text-lg"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Map Embed Box (Fixed for GitHub Pages compatibility) -->
+                    <div class="w-full lg:w-1/2 flex flex-col gap-2">
+                        <div class="w-full h-[320px] md:h-[380px] lg:h-full min-h-[300px] rounded-3xl overflow-hidden shadow-md border-4 border-white bg-brim-dark/5 relative">
+                            <!-- Standard basic reliable Google Maps Embed (No API key required) -->
+                            <iframe 
+                                src="https://maps.google.com/maps?q=Al+Nahyan,+Abu+Dhabi,+United+Arab+Emirates&t=&z=14&ie=UTF8&iwloc=&output=embed" 
+                                width="100%" 
+                                height="100%" 
+                                style="border:0;" 
+                                allowfullscreen="" 
+                                loading="lazy" 
+                                title="BRIM Coffee Location"
+                                class="absolute inset-0 w-full h-full">
+                            </iframe>
+                        </div>
+                        <!-- Reliable Fallback directions link -->
+                        <a href="https://www.google.com/maps/place/Brim+Coffee+-+%D8%A8%D8%B1%D9%8A%D9%85+%D9%83%D9%88%D9%81%D9%8A%E2%80%AD/@24.4201041,54.5316545,13z/data=!4m10!1m2!2m1!1sAl+Forsan+Trucks,+Abu+Dhabi+brim+coffee!3m6!1s0x3e5e479ac61661a5:0x5a545070555c4f9!8m2!3d24.4083689!4d54.5472731!15sCidBbCBGb3JzYW4gVHJ1Y2tzLCBBYnUgRGhhYmkgYnJpbSBjb2ZmZWWSAQRjYWZl4AEA!16s%2Fg%2F11zfb08dx3?entry=ttu&g_ep=EgoyMDI2MTAwNy4wIKXMDSoASAFQAw%3D%3D" target="_blank" class="w-full text-center bg-brim-dark text-white py-3 rounded-2xl font-bold text-sm hover:bg-brim-accent transition-colors shadow-sm flex items-center justify-center gap-2">
+                            <i class="fas fa-location-arrow"></i> Get Directions
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FLOATING SLIDE-IN SIDE CART DRAWER -->
+    <div id="cartDrawerBackdrop" class="fixed inset-0 drawer-backdrop z-50 opacity-0 pointer-events-none transition-opacity duration-300" onclick="closeCartDrawer()"></div>
+    
+    <aside id="cartDrawer" class="fixed top-0 right-0 h-full w-full max-w-[90vw] md:max-w-md bg-white z-50 shadow-2xl transform translate-x-full transition-transform duration-300 cubic-bezier(0.16, 1, 0.3, 1) flex flex-col">
+        
+        <!-- Drawer Header -->
+        <div class="p-4 md:p-5 border-b border-brim-dark/10 flex items-center justify-between bg-brim-cream/50">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-brim-dark text-brim-cream flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-shopping-bag text-base"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg md:text-xl text-brim-dark">Your Order Cart</h3>
+                    <p class="text-xs text-brim-dark/60" id="drawerCartSubtitle">0 items selected</p>
+                </div>
+            </div>
+            <button onclick="closeCartDrawer()" class="w-9 h-9 rounded-full bg-white border border-brim-dark/10 text-brim-dark hover:bg-brim-dark hover:text-white transition-all flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-times text-base"></i>
+            </button>
+        </div>
+
+        <!-- Drawer Body (Scrollable Cart Items) -->
+        <div id="cartItemsContainer" class="flex-grow p-4 md:p-5 overflow-y-auto space-y-4 divide-y divide-brim-dark/5">
+            <!-- Dynamic Cart Items injected here -->
+        </div>
+
+        <!-- Drawer Footer (Subtotal & Checkout Button) -->
+        <div class="p-4 md:p-5 border-t border-brim-dark/10 bg-brim-cream/30 space-y-4">
+            <div class="space-y-2">
+                <div class="flex justify-between text-sm text-brim-dark/70">
+                    <span>Subtotal</span>
+                    <span id="cartSubtotal" class="font-bold text-brim-dark">AED 0.00</span>
+                </div>
+                <div class="flex justify-between text-sm text-brim-dark/70">
+                    <span>Delivery Fee (Abu Dhabi)</span>
+                    <span class="font-semibold text-brim-accent text-right">Free Delivery</span>
+                </div>
+                <div class="flex justify-between text-base md:text-lg font-bold text-brim-dark pt-2 border-t border-brim-dark/10">
+                    <span>Total Amount</span>
+                    <span id="cartTotal" class="text-lg md:text-xl text-brim-dark">AED 0.00</span>
+                </div>
+            </div>
+
+            <button id="cartCheckoutBtn" onclick="openCheckoutModal()" disabled class="w-full bg-brim-dark text-brim-cream disabled:bg-brim-dark/30 disabled:cursor-not-allowed py-3 md:py-4 rounded-2xl font-bold text-sm md:text-base hover:bg-brim-accent transition-all shadow-lg flex items-center justify-center gap-2">
+                <span>Proceed to Checkout</span>
+                <i class="fas fa-arrow-right text-sm"></i>
+            </button>
+        </div>
+    </aside>
+
+    <!-- UAE CHECKOUT MODAL / PANEL -->
+    <div id="checkoutModalBackdrop" class="fixed inset-0 drawer-backdrop z-50 opacity-0 pointer-events-none transition-opacity duration-300 flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+        
+        <div id="checkoutModal" class="bg-white w-full max-w-2xl rounded-2xl md:rounded-[32px] shadow-2xl border border-brim-dark/10 transform scale-95 transition-all duration-300 my-4 overflow-hidden flex flex-col max-h-[95vh] sm:max-h-[90vh]">
+            
+            <!-- Modal Header -->
+            <div class="p-4 md:p-6 bg-brim-dark text-brim-cream flex items-center justify-between sticky top-0 z-10">
+                <div>
+                    <span class="text-[10px] sm:text-xs uppercase tracking-widest text-brim-gold font-bold">Delivery Details</span>
+                    <h3 class="text-xl sm:text-2xl font-bold">BRIM Coffee Checkout</h3>
+                </div>
+                <button onclick="closeCheckoutModal()" class="w-8 h-8 md:w-9 md:h-9 rounded-full bg-white/10 text-white hover:bg-white/20 transition-all flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Modal Content (Scrollable) -->
+            <div class="p-4 md:p-6 overflow-y-auto space-y-5 md:space-y-6 flex-grow">
+                
+                <!-- Order Summary Collapsible Banner -->
+                <div class="bg-brim-cream/70 rounded-2xl p-3 sm:p-4 border border-brim-dark/10 flex items-center justify-between gap-2">
+                    <div class="min-w-0 flex-1">
+                        <p class="text-[10px] sm:text-xs text-brim-dark/60 uppercase font-bold">Selected Items</p>
+                        <p id="checkoutItemsSummary" class="font-bold text-brim-dark text-xs sm:text-sm truncate w-full">No items selected</p>
+                    </div>
+                    <div class="text-right flex-shrink-0">
+                        <p class="text-[10px] sm:text-xs text-brim-dark/60 uppercase font-bold">Total</p>
+                        <p id="checkoutTotalSummary" class="font-extrabold text-base sm:text-lg text-brim-dark">AED 0.00</p>
+                    </div>
+                </div>
+
+                <!-- Checkout Form -->
+                <form id="uaeCheckoutForm" onsubmit="handleCheckoutSubmit(event)" class="space-y-4" novalidate>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Full Name -->
+                        <div class="sm:col-span-1">
+                            <label for="checkoutName" class="block text-xs font-bold uppercase tracking-wider text-brim-dark/80 mb-1">
+                                Full Name <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" id="checkoutName" required placeholder="e.g. Salem Al Mansoori" class="w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl border border-brim-dark/20 focus:border-brim-dark focus:ring-2 focus:ring-brim-accent/30 text-brim-dark text-sm outline-none transition-all bg-white">
+                            <span id="nameError" class="text-[10px] sm:text-xs text-red-600 hidden mt-1 block">Please enter your full name.</span>
+                        </div>
+
+                        <!-- UAE Mobile Number with Fixed +971 Prefix -->
+                        <div class="sm:col-span-1">
+                            <label for="checkoutPhone" class="block text-xs font-bold uppercase tracking-wider text-brim-dark/80 mb-1">
+                                UAE Mobile <span class="text-red-500">*</span>
+                            </label>
+                            <div class="flex items-center rounded-xl border border-brim-dark/20 focus-within:border-brim-dark focus-within:ring-2 focus-within:ring-brim-accent/30 overflow-hidden bg-white w-full">
+                                <span class="bg-brim-cream text-brim-dark font-bold text-sm px-2 sm:px-3 py-2.5 sm:py-3 border-r border-brim-dark/10 flex items-center gap-1.5 whitespace-nowrap">
+                                    <span class="text-xs">🇦🇪</span> +971
+                                </span>
+                                <!-- min-w-0 prevents flex blowout on extra small screens -->
+                                <input type="tel" id="checkoutPhone" required placeholder="+971 50 688 6424" oninput="validatePhoneLive()" class="w-full min-w-0 px-2 sm:px-3 py-2.5 sm:py-3 text-brim-dark text-sm outline-none bg-transparent">
+                            </div>
+                            <span id="phoneError" class="text-[10px] sm:text-xs text-red-600 hidden mt-1 block leading-tight">Enter a valid UAE mobile (e.g. 050, 052, 054, 055, 056, 058).</span>
+                        </div>
+                    </div>
+
+                    <!-- Emirate Selector -->
+                    <div>
+                        <label for="checkoutEmirate" class="block text-xs font-bold uppercase tracking-wider text-brim-dark/80 mb-1">
+                            Emirate / City <span class="text-red-500">*</span>
+                        </label>
+                        <select id="checkoutEmirate" required class="w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl border border-brim-dark/20 focus:border-brim-dark focus:ring-2 focus:ring-brim-accent/30 text-brim-dark text-sm outline-none bg-white transition-all font-medium">
+                            <option value="Abu Dhabi" selected>Abu Dhabi</option>
+                            <option value="Dubai">Dubai</option>
+                            <option value="Sharjah">Sharjah</option>
+                            <option value="Ajman">Ajman</option>
+                            <option value="Umm Al Quwain">Umm Al Quwain</option>
+                            <option value="Ras Al Khaimah">Ras Al Khaimah</option>
+                            <option value="Fujairah">Fujairah</option>
+                        </select>
+                        <span id="emirateError" class="text-[10px] sm:text-xs text-red-600 hidden mt-1 block">Please select an Emirate.</span>
+                    </div>
+
+                    <!-- Address Breakdown Fields -->
+                    <div class="space-y-4">
+                        <div>
+                            <label for="checkoutBuilding" class="block text-xs font-bold uppercase tracking-wider text-brim-dark/80 mb-1">
+                                Address <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" id="checkoutBuilding" required placeholder="e.g." class="w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl border border-brim-dark/20 focus:border-brim-dark focus:ring-2 focus:ring-brim-accent/30 text-brim-dark text-sm outline-none transition-all bg-white">
+                            <span id="buildingError" class="text-[10px] sm:text-xs text-red-600 hidden mt-1 block">Address details are required.</span>
+                        </div>
+
+                        <div>
+                            <label for="checkoutStreet" class="block text-xs font-bold uppercase tracking-wider text-brim-dark/80 mb-1">
+                                Landmark / Extra Details <span class="text-brim-dark/40 font-normal">(Optional)</span>
+                            </label>
+                            <input type="text" id="checkoutStreet" placeholder="e.g. Near Al Nahyan Park, Gate 2" class="w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl border border-brim-dark/20 focus:border-brim-dark focus:ring-2 focus:ring-brim-accent/30 text-brim-dark text-sm outline-none transition-all bg-white">
+                        </div>
+                    </div>
+
+                    <!-- Special Requests / Order Notes -->
+                    <div>
+                        <label for="checkoutNotes" class="block text-xs font-bold uppercase tracking-wider text-brim-dark/80 mb-1">
+                            Order Notes or Requests <span class="text-brim-dark/40 font-normal">(Optional)</span>
+                        </label>
+                        <textarea id="checkoutNotes" rows="2" placeholder="e.g. Extra hot milk, less sweet..." class="w-full px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl border border-brim-dark/20 focus:border-brim-dark focus:ring-2 focus:ring-brim-accent/30 text-brim-dark text-sm outline-none transition-all resize-none bg-white"></textarea>
+                    </div>
+
+                    <!-- Notice Disclaimer -->
+                    <div class="bg-brim-cream/50 p-3 sm:p-3.5 rounded-xl border border-brim-dark/10 flex items-start gap-2.5 text-[11px] sm:text-xs text-brim-dark/80">
+                        <i class="fab fa-whatsapp text-green-600 text-base sm:text-lg mt-0.5"></i>
+                        <p class="leading-relaxed">
+                            Clicking <strong>Place Order on WhatsApp</strong> will open WhatsApp with your formatted order summary. You must press <strong>Send</strong> inside WhatsApp to submit your order to our Abu Dhabi team.
+                        </p>
+                    </div>
+                    
+                    <!-- Submit Order Button -->
+                    <div class="pt-2 sticky bottom-0 bg-white pb-2 sm:pb-0">
+                        <button type="submit" class="w-full bg-[#25D366] text-white hover:bg-[#20bd5a] py-3.5 sm:py-4 rounded-2xl font-bold text-sm sm:text-base shadow-lg transition-all flex items-center justify-center gap-2 active:scale-[0.98]">
+                            <i class="fab fa-whatsapp text-lg sm:text-xl"></i>
+                            <span>Place Order on WhatsApp</span>
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-brim-dark text-brim-cream pt-16 pb-8 border-t-[8px] border-brim-accent mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-16 items-center md:items-start text-center md:text-left">
+                
+                <!-- Footer Column 1: Logo & Info -->
+                <div class="flex flex-col items-center md:items-start">
+                    <div class="flex items-center mb-4 gap-3">
+                        <img src="logo.jpg" alt="BRIM Logo" class="h-12 w-12 object-cover rounded-full border border-brim-cream/30" onerror="this.src='https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=150&q=80'">
+                        <span class="font-extrabold text-2xl tracking-widest uppercase text-brim-gold">BRIM</span>
+                    </div>
+                    <p class="text-brim-cream/70 text-sm max-w-xs leading-relaxed">
+                        Crafting signature coffee and fresh bakery goods in Abu Dhabi. Every cup served under the brim of quality.
+                    </p>
+                    
+                    <!-- Footer Socials -->
+                    <div class="mt-4 flex gap-4">
+                        <a href="#" id="footerInstaLink" target="_blank" class="text-brim-cream/60 hover:text-brim-gold transition-colors">
+                            <i class="fab fa-instagram text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Footer Column 2: Quick Links -->
+                <div class="flex flex-col space-y-2.5">
+                    <h4 class="font-bold text-lg mb-2 text-white">Quick Links</h4>
+                    <button onclick="navigateTo('home')" class="text-brim-cream/80 hover:text-brim-gold transition-colors text-sm text-left mx-auto md:mx-0 w-max">Home</button>
+                    <button onclick="scrollToMenu()" class="text-brim-cream/80 hover:text-brim-gold transition-colors text-sm text-left mx-auto md:mx-0 w-max">Menu & Ordering</button>
+                    <button onclick="navigateTo('contact')" class="text-brim-cream/80 hover:text-brim-gold transition-colors text-sm text-left mx-auto md:mx-0 w-max">Abu Dhabi Location</button>
+                    <button onclick="openCartDrawer()" class="text-brim-cream/80 hover:text-brim-gold transition-colors text-sm text-left mx-auto md:mx-0 w-max">View Cart</button>
+                </div>
+
+                <!-- Footer Column 3: Contact & Hours -->
+                <div class="flex flex-col items-center md:items-start space-y-2">
+                    <h4 class="font-bold text-lg mb-2 text-white">Opening Hours</h4>
+                    <p class="text-sm text-brim-cream/80">Monday – Sunday: 7:00 AM – 11:00 PM</p>
+                    <p class="text-sm text-brim-cream/80 font-bold text-brim-gold pt-1">Al Nahyan, Abu Dhabi, UAE</p>
+                    <p class="text-sm text-brim-cream/80">+971 50 688 6424</p>
+                </div>
+            </div>
+
+            
+<div class="mt-12 pt-8 border-t border-brim-cream/10 text-center text-xs text-brim-cream/50">
+    <p>&copy;  Powered by <span id="year"></span> <a href="https://www.instagram.com/ksi.webs/" target="_blank" rel="noopener" class="font-extrabold text-brim-gold hover:text-brim-cream transition-colors underline-offset-2 hover:underline">KSi Webs</a></p>
+</div>
+
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT APP LOGIC -->
+    <script>
+        // Set dynamic copyright year
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // ==========================================
+        // CONFIGURATION: UPDATE THESE REAL DETAILS
+        // ==========================================
+        const ADMIN_WHATSAPP_NUMBER = '971506886424'; 
+        const INSTAGRAM_URL = 'https://www.instagram.com/brimcoffee.ae/';
+
+        const contactWhatsAppLink = document.getElementById('contactWhatsAppLink');
+        if (contactWhatsAppLink) {
+            contactWhatsAppLink.href = `https://wa.me/${ADMIN_WHATSAPP_NUMBER}?text=${encodeURIComponent('Hi BRIM Coffee, I want to ask about your menu.')}`;
+        }
+        
+        // Inject Instagram link into all placeholder buttons
+        document.getElementById('headerInstaLink').href = INSTAGRAM_URL;
+        document.getElementById('mobileHeaderInstaLink').href = INSTAGRAM_URL;
+        document.getElementById('contactInstaLink').href = INSTAGRAM_URL;
+        document.getElementById('footerInstaLink').href = INSTAGRAM_URL;
+        // ==========================================
+
+        // MASTER MENU DATA STORE (UAE AED Prices)
+        const MENU_ITEMS = [
+            { id: 'espresso', name: 'Classic Espresso', category: 'Coffee', price: 14, image: 'https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?auto=format&fit=crop&w=400&q=80', desc: 'Rich, bold, and pure single shot.' },
+            { id: 'cappuccino', name: 'Creamy Cappuccino', category: 'Coffee', price: 18, image: 'https://images.unsplash.com/photo-1534778101976-62847782c213?auto=format&fit=crop&w=400&q=80', desc: 'Perfect balance of espresso & rich foam.' },
+            { id: 'latte', name: 'Vanilla Latte', category: 'Coffee', price: 20, image: 'https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?auto=format&fit=crop&w=400&q=80', desc: 'Smooth espresso with sweet Madagascar vanilla.' },
+            { id: 'americano', name: 'Black Americano', category: 'Coffee', price: 15, image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=400&q=80', desc: 'Bold espresso diluted with hot water.' },
+            { id: 'mocha', name: 'Dark Mocha', category: 'Coffee', price: 22, image: 'https://images.unsplash.com/photo-1578314675249-a6910f80cc4e?auto=format&fit=crop&w=400&q=80', desc: 'Espresso meets rich Belgian dark chocolate.' },
+            
+            { id: 'matcha', name: 'Iced Matcha', category: 'Cold Drinks', price: 24, image: 'https://images.unsplash.com/photo-1536256263959-770b48d82b0a?auto=format&fit=crop&w=400&q=80', desc: 'Uji ceremonial grade matcha with cold milk.' },
+            { id: 'coldbrew', name: 'Nitro Cold Brew', category: 'Cold Drinks', price: 22, image: 'https://images.unsplash.com/photo-1517701604599-bb29b565090c?auto=format&fit=crop&w=400&q=80', desc: 'Slow-steeped 18 hours, infused with nitrogen.' },
+            { id: 'frappe', name: 'Caramel Frappe', category: 'Cold Drinks', price: 25, image: 'https://images.unsplash.com/photo-1572490122747-3968b75cc699?auto=format&fit=crop&w=400&q=80', desc: 'Blended coffee with rich caramel drizzle.' },
+            { id: 'icedtea', name: 'Peach Iced Tea', category: 'Cold Drinks', price: 18, image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=400&q=80', desc: 'Hand-brewed black tea with peach nectar.' },
+            { id: 'smoothie', name: 'Berry Berry', category: 'Cold Drinks', price: 24, image: 'https://images.unsplash.com/photo-1553530666-ba11a7da3888?auto=format&fit=crop&w=400&q=80', desc: 'Fresh organic berries & Greek yogurt blend.' },
+            
+            { id: 'croissant', name: 'Butter Croissant', category: 'Bakery', price: 14, image: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=400&q=80', desc: 'Flaky, French butter croissant baked daily.' },
+            { id: 'muffin', name: 'Blueberry Muffin', category: 'Bakery', price: 16, image: 'https://images.unsplash.com/photo-1607958996333-41aef7caefaa?auto=format&fit=crop&w=400&q=80', desc: 'Moist muffin loaded with wild blueberries.' },
+            { id: 'brownie', name: 'Fudge Brownie', category: 'Bakery', price: 15, image: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=400&q=80', desc: 'Gooey, dark chocolate fudge brownie.' },
+            { id: 'cookie', name: 'Choco Chip Cookie', category: 'Bakery', price: 12, image: 'https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&w=400&q=80', desc: 'Warm, soft-baked cookie with chocolate chunks.' },
+            { id: 'cheesecake', name: 'Cheesecake Slice', category: 'Bakery', price: 22, image: 'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?auto=format&fit=crop&w=400&q=80', desc: 'Classic creamy New York cheesecake.' }
+        ];
+
+        // CART STATE
+        let cartState = [];
+
+        // Single Page App Router
+        function navigateTo(pageId) {
+            const homeView = document.getElementById('home-view');
+            const contactView = document.getElementById('contact-view');
+
+            if (pageId === 'home') {
+                homeView.classList.remove('page-hidden');
+                contactView.classList.add('page-hidden');
+            } else if (pageId === 'contact') {
+                homeView.classList.add('page-hidden');
+                contactView.classList.remove('page-hidden');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function scrollToMenu() {
+            navigateTo('home');
+            setTimeout(() => {
+                const menuSection = document.getElementById('menu-section');
+                if (menuSection) {
+                    // Adjust scrolling distance so sticky header doesn't block top elements
+                    const yOffset = -90; 
+                    const y = menuSection.getBoundingClientRect().top + window.scrollY + yOffset;
+                    window.scrollTo({top: y, behavior: 'smooth'});
+                }
+            }, 100);
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // INITIALIZE MARQUEE SLIDERS WITH CLONING & PAUSE ON HOVER
+        let marqueeAnimations = [];
+        
+        function initMarquees() {
+            const marquees = document.querySelectorAll('.marquee-content');
+            
+            marquees.forEach((marquee, index) => {
+                // Duplicate items seamless looping animation
+                const originalHTML = marquee.innerHTML;
+                marquee.innerHTML = originalHTML + originalHTML;
+                
+                const direction = marquee.getAttribute('data-direction');
+                const speed = marquee.getAttribute('data-speed') || '35s';
+                
+                const animationName = direction === 'right' ? `scrollRight ${speed} linear infinite` : `scrollLeft ${speed} linear infinite`;
+                marquee.style.animation = animationName;
+                marquee.style.transformOrigin = 'left center';
+                marquee.dataset.defaultAnimation = animationName;
+                marquee.dataset.manualOffset = '0';
+                
+                // Store original setting for resetting
+                marqueeAnimations.push(animationName);
+
+                marquee.addEventListener('mouseenter', () => {
+                    if (!marquee.dataset.manualMode) {
+                        marquee.style.animationPlayState = 'paused';
+                    }
+                });
+                marquee.addEventListener('mouseleave', () => {
+                    if (!marquee.dataset.manualMode) {
+                        marquee.style.animationPlayState = 'running';
+                    }
+                });
+
+                let dragState = null;
+
+                marquee.addEventListener('pointerdown', (event) => {
+                    if (event.pointerType === 'mouse' && event.button !== 0) return;
+                    if (event.target.closest('button, a, input, textarea, select, option')) return;
+                    marquee.setPointerCapture(event.pointerId);
+                    dragState = {
+                        startX: event.clientX,
+                        startOffset: Number(marquee.dataset.manualOffset || 0),
+                        isDragging: true
+                    };
+                    marquee.dataset.manualMode = 'true';
+                    marquee.style.animation = 'none';
+                    marquee.style.transition = 'none';
+                    marquee.style.animationPlayState = 'paused';
+                });
+
+                marquee.addEventListener('pointermove', (event) => {
+                    if (!dragState || !dragState.isDragging) return;
+                    const deltaX = event.clientX - dragState.startX;
+                    const nextOffset = dragState.startOffset + deltaX;
+                    marquee.dataset.manualOffset = String(nextOffset);
+                    marquee.style.transform = `translateX(${nextOffset}px)`;
+                });
+
+                const endDrag = () => {
+                    if (!dragState) return;
+                    dragState.isDragging = false;
+                    marquee.style.transition = 'transform 0.25s ease';
+                    marquee.style.transform = 'translateX(0)';
+                    marquee.dataset.manualOffset = '0';
+                    marquee.dataset.manualMode = 'false';
+                    marquee.style.animation = marquee.dataset.defaultAnimation;
+                    marquee.style.animationPlayState = 'running';
+                    dragState = null;
+                };
+
+                marquee.addEventListener('pointerup', endDrag);
+                marquee.addEventListener('pointerleave', endDrag);
+                marquee.addEventListener('pointercancel', endDrag);
+            });
+
+            document.querySelectorAll('.marquee-nav-btn').forEach((button) => {
+                button.addEventListener('click', () => {
+                    const targetId = button.getAttribute('data-marquee-target');
+                    const action = button.getAttribute('data-marquee-action');
+                    const marquee = document.getElementById(targetId)?.querySelector('.marquee-content');
+                    if (!marquee) return;
+
+                    const direction = action === 'next' ? 1 : -1;
+                    const step = Math.max((marquee.firstElementChild?.getBoundingClientRect().width || 240) + 24, 220);
+                    const currentOffset = Number(marquee.dataset.manualOffset || 0);
+                    const nextOffset = currentOffset + (direction * step);
+                    marquee.dataset.manualOffset = String(nextOffset);
+                    marquee.dataset.manualMode = 'true';
+                    marquee.style.animation = 'none';
+                    marquee.style.transform = `translateX(${nextOffset}px)`;
+                    marquee.style.animationPlayState = 'paused';
+
+                    clearTimeout(marquee.manualResetTimer);
+                    marquee.manualResetTimer = setTimeout(() => {
+                        marquee.dataset.manualMode = 'false';
+                        marquee.dataset.manualOffset = '0';
+                        marquee.style.transform = 'translateX(0)';
+                        marquee.style.animation = marquee.dataset.defaultAnimation;
+                        marquee.style.animationPlayState = 'running';
+                    }, 1200);
+                });
+            });
+        }
+
+        // SMART MENU SEARCH IMPLEMENTATION
+        function initSmartSearch() {
+            const searchInput = document.getElementById('smartMenuSearch');
+            const suggestionsContainer = document.getElementById('searchSuggestions');
+            const clearBtn = document.getElementById('clearSearchBtn');
+            const searchShell = document.querySelector('.search-input-shell');
+
+            if (!searchInput) return;
+
+            searchInput.addEventListener('focus', () => {
+                searchShell?.classList.add('expanded');
+            });
+
+            searchInput.addEventListener('blur', () => {
+                if (!searchInput.value.trim()) {
+                    searchShell?.classList.remove('expanded');
+                }
+            });
+
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.trim().toLowerCase();
+                
+                if (query.length > 0) {
+                    clearBtn.classList.remove('hidden');
+                } else {
+                    clearBtn.classList.add('hidden');
+                    suggestionsContainer.classList.add('hidden');
+                    return;
+                }
+
+                // Filter items from master MENU_ITEMS data (prevents duplicates and is case-insensitive)
+                const matches = MENU_ITEMS.filter(item => 
+                    item.name.toLowerCase().includes(query) || 
+                    item.category.toLowerCase().includes(query) ||
+                    item.desc.toLowerCase().includes(query)
+                );
+
+                if (matches.length === 0) {
+                    suggestionsContainer.innerHTML = `
+                        <div class="p-4 text-center text-brim-dark/60 font-medium text-sm">
+                            <i class="fas fa-search-minus text-2xl text-brim-dark/30 mb-2 block"></i>
+                            No items found matching "<span class="font-bold">${e.target.value}</span>"
+                        </div>
+                    `;
+                } else {
+                    suggestionsContainer.innerHTML = matches.map(item => `
+                        <div onclick="selectSearchSuggestion('${item.id}', '${item.name.replace(/'/g, "\\'")}')" class="p-3 flex items-center justify-between hover:bg-brim-cream cursor-pointer transition-colors rounded-2xl group">
+                            <div class="flex items-center gap-3">
+                                <img src="${item.image}" alt="${item.name}" class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl object-cover shadow-sm">
+                                <div>
+                                    <h4 class="font-bold text-sm text-brim-dark group-hover:text-brim-accent transition-colors">${item.name}</h4>
+                                    <span class="text-[10px] font-bold text-brim-accent uppercase">${item.category}</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 sm:gap-3">
+                                <span class="font-extrabold text-xs sm:text-sm text-brim-dark">AED ${item.price}</span>
+                                <span class="text-[10px] sm:text-xs bg-brim-dark text-brim-cream font-bold px-2 py-1 rounded-full group-hover:bg-brim-accent transition-colors">
+                                    View <i class="fas fa-arrow-right text-[10px] ml-0.5"></i>
+                                </span>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+                suggestionsContainer.classList.remove('hidden');
+            });
+
+            // Close suggestion dropdown if clicking outside
+            document.addEventListener('click', (e) => {
+                if (!searchInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
+                    suggestionsContainer.classList.add('hidden');
+                }
+            });
+        }
+
+        function clearSmartSearch() {
+            const searchInput = document.getElementById('smartMenuSearch');
+            const suggestionsContainer = document.getElementById('searchSuggestions');
+            const clearBtn = document.getElementById('clearSearchBtn');
+            
+            searchInput.value = '';
+            clearBtn.classList.add('hidden');
+            suggestionsContainer.classList.add('hidden');
+        }
+
+        function clearSearchResultFocus() {
+            document.getElementById('searchResultLabel').classList.add('hidden');
+            document.querySelectorAll('.highlight-item').forEach(el => el.classList.remove('highlight-item'));
+            
+            // Resume marquee animations
+            document.querySelectorAll('.marquee-content').forEach((m, index) => {
+                m.style.animation = marqueeAnimations[index];
+            });
+        }
+
+        // When user clicks a search suggestion
+        function selectSearchSuggestion(itemId, itemName) {
+            clearSmartSearch();
+            
+            // Show result label
+            const label = document.getElementById('searchResultLabel');
+            label.classList.remove('hidden');
+            document.getElementById('searchResultTerm').textContent = itemName;
+
+            // Stop animations momentarily to prevent layout shifts while scrolling
+            const marquees = document.querySelectorAll('.marquee-content');
+            marquees.forEach(m => m.style.animation = 'none');
+
+            setTimeout(() => {
+                // Find matching DOM card (takes first instance in marquee to avoid duplicate searching)
+                const targetCard = document.querySelector(`.menu-card[data-item-id="${itemId}"]`);
+                if (targetCard) {
+                    
+                    // Header offset to avoid navbar overlapping
+                    const yOffset = -120; 
+                    const y = targetCard.getBoundingClientRect().top + window.scrollY + yOffset;
+                    
+                    window.scrollTo({top: y, behavior: 'smooth'});
+                    
+                    // Remove existing highlights
+                    document.querySelectorAll('.highlight-item').forEach(el => el.classList.remove('highlight-item'));
+                    
+                    // Apply highlight
+                    document.querySelectorAll(`.menu-card[data-item-id="${itemId}"]`).forEach(card => {
+                        card.classList.add('highlight-item');
+                    });
+                }
+                
+                // Keep animation paused briefly so the user can see the exact target without it running away
+                setTimeout(() => {
+                    marquees.forEach((m, index) => {
+                        m.style.animation = marqueeAnimations[index];
+                    });
+                }, 4000);
+            }, 10);
+        }
+
+        // CART MANAGEMENT FUNCTIONS
+        function addToCart(itemId) {
+            const itemData = MENU_ITEMS.find(item => item.id === itemId);
+            if (!itemData) return;
+
+            const existingIndex = cartState.findIndex(entry => entry.id === itemId);
+            if (existingIndex > -1) {
+                cartState[existingIndex].quantity += 1;
+            } else {
+                cartState.push({
+                    id: itemData.id,
+                    name: itemData.name,
+                    price: itemData.price,
+                    image: itemData.image,
+                    quantity: 1
+                });
+            }
+
+            updateCartUI();
+            showCartToast(`${itemData.name} added to cart`);
+        }
+
+        function updateCartQuantity(itemId, delta) {
+            const index = cartState.findIndex(entry => entry.id === itemId);
+            if (index === -1) return;
+
+            cartState[index].quantity += delta;
+            if (cartState[index].quantity <= 0) {
+                cartState.splice(index, 1);
+            }
+
+            updateCartUI();
+        }
+
+        function removeFromCart(itemId) {
+            cartState = cartState.filter(entry => entry.id !== itemId);
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const totalItemsCount = cartState.reduce((sum, item) => sum + item.quantity, 0);
+            const totalAmount = cartState.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+            // Update Header & Floating Badges
+            document.getElementById('navCartBadge').textContent = totalItemsCount;
+            document.getElementById('mobileNavCartBadge').textContent = totalItemsCount;
+            document.getElementById('floatingCartCount').textContent = totalItemsCount;
+            document.getElementById('drawerCartSubtitle').textContent = `${totalItemsCount} ${totalItemsCount === 1 ? 'item' : 'items'} selected`;
+
+            // Update Totals
+            document.getElementById('cartSubtotal').textContent = `AED ${totalAmount.toFixed(2)}`;
+            document.getElementById('cartTotal').textContent = `AED ${totalAmount.toFixed(2)}`;
+
+            // Checkout Button State
+            const checkoutBtn = document.getElementById('cartCheckoutBtn');
+            checkoutBtn.disabled = cartState.length === 0;
+
+            // Render Cart Drawer Items List
+            const container = document.getElementById('cartItemsContainer');
+            if (cartState.length === 0) {
+                container.innerHTML = `
+                    <div class="py-16 text-center text-brim-dark/60 space-y-3">
+                        <div class="w-16 h-16 bg-brim-cream rounded-full flex items-center justify-center mx-auto text-brim-dark/40 text-2xl">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                        <h4 class="font-bold text-lg text-brim-dark">Your cart is empty</h4>
+                        <p class="text-xs max-w-xs mx-auto text-brim-dark/70">Add some delicious coffee, cold drinks, or freshly baked treats from our menu!</p>
+                        <button onclick="closeCartDrawer(); scrollToMenu()" class="mt-2 text-xs font-bold bg-brim-dark text-brim-cream px-5 py-2.5 rounded-full hover:bg-brim-accent transition-all">
+                            Browse Menu
+                        </button>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = cartState.map(item => `
+                    <div class="py-3 flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                            <img src="${item.image}" alt="${item.name}" class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl object-cover shadow-sm border border-brim-dark/10 flex-shrink-0">
+                            <div class="min-w-0">
+                                <h4 class="font-bold text-[13px] sm:text-sm text-brim-dark truncate">${item.name}</h4>
+                                <p class="text-[11px] sm:text-xs text-brim-dark/60">AED ${item.price} each</p>
+                                <span class="font-extrabold text-[11px] sm:text-xs text-brim-dark">Subtotal: AED ${(item.price * item.quantity).toFixed(2)}</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+                            <div class="flex items-center border border-brim-dark/20 rounded-full bg-brim-cream px-1.5 py-1 sm:px-2 gap-1 sm:gap-2">
+                                <button onclick="updateCartQuantity('${item.id}', -1)" class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-white text-brim-dark font-bold text-xs flex items-center justify-center hover:bg-brim-dark hover:text-white transition-colors shadow-xs">
+                                    <i class="fas fa-minus text-[8px] sm:text-[10px]"></i>
+                                </button>
+                                <span class="font-bold text-xs text-brim-dark min-w-[12px] sm:min-w-[14px] text-center">${item.quantity}</span>
+                                <button onclick="updateCartQuantity('${item.id}', 1)" class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-white text-brim-dark font-bold text-xs flex items-center justify-center hover:bg-brim-dark hover:text-white transition-colors shadow-xs">
+                                    <i class="fas fa-plus text-[8px] sm:text-[10px]"></i>
+                                </button>
+                            </div>
+                            <button onclick="removeFromCart('${item.id}')" title="Remove item" class="text-brim-dark/40 hover:text-red-600 p-1.5 transition-colors">
+                                <i class="fas fa-trash-alt text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function showCartToast(message) {
+            const toast = document.getElementById('cartToast');
+            const toastMsg = document.getElementById('toastMessage');
+            if (!toast) return;
+
+            toastMsg.textContent = message;
+            toast.classList.add('show');
+
+            clearTimeout(window.toastTimer);
+            window.toastTimer = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2800);
+        }
+
+        // DRAWER CONTROLS
+        function openCartDrawer() {
+            document.getElementById('cartDrawerBackdrop').classList.remove('opacity-0', 'pointer-events-none');
+            document.getElementById('cartDrawer').classList.remove('translate-x-full');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeCartDrawer() {
+            document.getElementById('cartDrawerBackdrop').classList.add('opacity-0', 'pointer-events-none');
+            document.getElementById('cartDrawer').classList.add('translate-x-full');
+            document.body.style.overflow = '';
+        }
+
+        // CHECKOUT MODAL CONTROLS
+        function openCheckoutModal() {
+            if (cartState.length === 0) return;
+
+            closeCartDrawer();
+
+            // Populate checkout summary
+            const itemsText = cartState.map(i => `${i.name} (${i.quantity}x)`).join(', ');
+            const totalAmount = cartState.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+
+            document.getElementById('checkoutItemsSummary').textContent = itemsText;
+            document.getElementById('checkoutTotalSummary').textContent = `AED ${totalAmount.toFixed(2)}`;
+
+            const backdrop = document.getElementById('checkoutModalBackdrop');
+            const modal = document.getElementById('checkoutModal');
+
+            backdrop.classList.remove('opacity-0', 'pointer-events-none');
+            modal.classList.remove('scale-95');
+            modal.classList.add('scale-100');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeCheckoutModal() {
+            const backdrop = document.getElementById('checkoutModalBackdrop');
+            const modal = document.getElementById('checkoutModal');
+
+            backdrop.classList.add('opacity-0', 'pointer-events-none');
+            modal.classList.remove('scale-100');
+            modal.classList.add('scale-95');
+            document.body.style.overflow = '';
+        }
+
+        // STRICT UAE MOBILE PHONE VALIDATION
+        function parseUAEMobile(rawPhone) {
+            if (!rawPhone) return { isValid: false, formatted: '' };
+
+            // Strip spaces, hyphens, brackets, leading plus or non-digits
+            let cleaned = rawPhone.replace(/\D/g, '');
+
+            // Handle standard UAE International prefixes: 9715xxxxxxxx or 009715xxxxxxxx
+            if (cleaned.startsWith('00971')) {
+                cleaned = cleaned.substring(5);
+            } else if (cleaned.startsWith('971')) {
+                cleaned = cleaned.substring(3);
+            }
+
+            // If user starts with 0 (e.g. 0501234567), strip the leading zero
+            if (cleaned.startsWith('0')) {
+                cleaned = cleaned.substring(1);
+            }
+
+            // Cleaned number should now be 9 digits and start with 50, 52, 54, 55, 56, or 58
+            const uaeMobilePrefixes = ['50', '52', '54', '55', '56', '58'];
+            const isValidLength = cleaned.length === 9;
+            const hasValidPrefix = uaeMobilePrefixes.some(prefix => cleaned.startsWith(prefix));
+
+            if (isValidLength && hasValidPrefix) {
+                // Return normalized UAE phone format: +971 5X XXX XXXX
+                const formatted = `+971 ${cleaned.substring(0, 2)} ${cleaned.substring(2, 5)} ${cleaned.substring(5)}`;
+                return { isValid: true, formatted: formatted, rawNumber: `+971${cleaned}` };
+            }
+
+            return { isValid: false, formatted: '' };
+        }
+
+        function validatePhoneLive() {
+            const phoneInput = document.getElementById('checkoutPhone');
+            const errorSpan = document.getElementById('phoneError');
+            const res = parseUAEMobile(phoneInput.value);
+
+            if (phoneInput.value.trim() === '') {
+                errorSpan.classList.add('hidden');
+                return true;
+            }
+
+            if (!res.isValid) {
+                errorSpan.classList.remove('hidden');
+                return false;
+            } else {
+                errorSpan.classList.add('hidden');
+                return true;
+            }
+        }
+
+        // HANDLE FORM SUBMISSION & WHATSAPP REDIRECT
+        function handleCheckoutSubmit(e) {
+            e.preventDefault();
+
+            // 1. Validate Cart
+            if (cartState.length === 0) {
+                alert('Your cart is empty. Please add items before checking out.');
+                return;
+            }
+
+            // 2. Validate Required Form Fields
+            const name = document.getElementById('checkoutName').value.trim();
+            const phoneVal = document.getElementById('checkoutPhone').value.trim();
+            const emirate = document.getElementById('checkoutEmirate').value;
+            const building = document.getElementById('checkoutBuilding').value.trim();
+            const street = document.getElementById('checkoutStreet').value.trim();
+            const notes = document.getElementById('checkoutNotes').value.trim();
+
+            let hasErrors = false;
+
+            if (!name) {
+                document.getElementById('nameError').classList.remove('hidden');
+                hasErrors = true;
+            } else {
+                document.getElementById('nameError').classList.add('hidden');
+            }
+
+            const phoneValidation = parseUAEMobile(phoneVal);
+            if (!phoneValidation.isValid) {
+                document.getElementById('phoneError').classList.remove('hidden');
+                hasErrors = true;
+            } else {
+                document.getElementById('phoneError').classList.add('hidden');
+            }
+
+            if (!emirate) {
+                document.getElementById('emirateError').classList.remove('hidden');
+                hasErrors = true;
+            } else {
+                document.getElementById('emirateError').classList.add('hidden');
+            }
+
+            if (!building) {
+                document.getElementById('buildingError').classList.remove('hidden');
+                hasErrors = true;
+            } else {
+                document.getElementById('buildingError').classList.add('hidden');
+            }
+
+            if (!building) {
+                document.getElementById('buildingError').classList.remove('hidden');
+                hasErrors = true;
+            } else {
+                document.getElementById('buildingError').classList.add('hidden');
+            }
+
+            if (hasErrors) return;
+
+            // 3. Format Delivery Address
+            let fullAddress = building;
+            if (street) fullAddress += `, ${street}`;
+
+            // 4. Calculate Totals
+            const totalAmount = cartState.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+            // 5. Construct Neatly Formatted WhatsApp Message
+            let itemsTextList = cartState.map(item => 
+                `• ${item.name} x${item.quantity} - AED ${(item.price * item.quantity).toFixed(2)} (AED ${item.price} ea)`
+            ).join('\n');
+
+            let whatsappMsg = `☕ *BRIM COFFEE — NEW ORDER* ☕\n`;
+            whatsappMsg += `------------------------------------\n`;
+            whatsappMsg += `👤 *Customer Details:*\n`;
+            whatsappMsg += `• *Name:* ${name}\n`;
+            whatsappMsg += `• *Phone:* ${phoneValidation.formatted}\n`;
+            whatsappMsg += `• *Emirate:* ${emirate}\n`;
+            whatsappMsg += `• *Delivery Address:* ${fullAddress}\n`;
+            if (street) whatsappMsg += `• *Landmark / Extra Details:* ${street}\n`;
+            whatsappMsg += `\n📋 *Order Items:*\n${itemsTextList}\n\n`;
+            if (notes) whatsappMsg += `📝 *Special Requests:* ${notes}\n\n`;
+            whatsappMsg += `💰 *TOTAL AMOUNT: AED ${totalAmount.toFixed(2)}*\n`;
+            whatsappMsg += `------------------------------------\n`;
+            whatsappMsg += `Thank you for ordering with BRIM Coffee Abu Dhabi!`;
+
+            // 6. Generate WhatsApp Link
+            const whatsappUrl = `https://wa.me/${ADMIN_WHATSAPP_NUMBER}?text=${encodeURIComponent(whatsappMsg)}`;
+
+            // 7. Open WhatsApp Link
+            window.open(whatsappUrl, '_blank');
+
+            // 8. Close Modal and notify customer
+            closeCheckoutModal();
+            showCartToast('Opening WhatsApp to send your order...');
+        }
+
+        // Initialize Application
+        document.addEventListener('DOMContentLoaded', () => {
+            initMarquees();
+            initSmartSearch();
+            updateCartUI();
+        });
+    </script>
+</body>
+</html>
